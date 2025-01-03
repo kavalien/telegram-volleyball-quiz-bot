@@ -550,13 +550,10 @@ async def end_quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # Функция main для запуска бота
 # -------------------------
 def main():
-    # Для запуска локально: замените на свой токен
-    # При деплое на Railway — используйте os.environ.get("BOT_TOKEN")
+    # При деплое на Railway используйте переменную окружения BOT_TOKEN
     token = os.environ.get("BOT_TOKEN", "YOUR_TELEGRAM_BOT_TOKEN")
 
-    # Можно сохранить состояние диалога между рестартами бота — PicklePersistence
     persistence = PicklePersistence(filepath="bot_state.pkl")
-
     application = ApplicationBuilder().token(token).persistence(persistence).build()
 
     conv_handler = ConversationHandler(
@@ -572,4 +569,10 @@ def main():
     application.add_handler(conv_handler)
 
     logger.info("Бот запущен. Ожидание сообщений...")
-  
+
+    # ВАЖНО: запускаем long polling, чтобы бот получал апдейты
+    application.run_polling()
+
+
+if __name__ == "__main__":
+    main()

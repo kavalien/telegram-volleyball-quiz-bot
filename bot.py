@@ -383,6 +383,10 @@ async def main_menu_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Возвращаемся в меню (или просто оставим так)
         return await show_main_menu(update, context)
 
+    elif choice == "Вернуться в меню":
+        # Если пользователь нажал кнопку «Вернуться в меню» после викторины
+        return await show_main_menu(update, context)
+
     else:
         await update.message.reply_text("Пожалуйста, выберите пункт из меню.")
         return MAIN_MENU
@@ -505,7 +509,7 @@ async def end_quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Твой общий счёт: {scoreboard[user_id]['score']}."
     )
 
-    # Кнопка вернуться в меню
+    # Кнопка «Вернуться в меню»
     keyboard = [["Вернуться в меню"]]
     await update.message.reply_text(
         "Нажмите, чтобы вернуться в главное меню:",
@@ -516,7 +520,8 @@ async def end_quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["questions"] = []
     context.user_data["current_question_index"] = 0
     context.user_data["score_this_round"] = 0
-    # Возвращаемся в MAIN_MENU, когда пользователь нажмёт «Вернуться в меню»
+
+    # ВНИМАНИЕ: возращаем MAIN_MENU вместо ConversationHandler.END
     return MAIN_MENU
 
 # -------------------------
@@ -525,6 +530,7 @@ async def end_quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     token = os.environ.get("BOT_TOKEN", "YOUR_TELEGRAM_BOT_TOKEN")
 
+    # Сохраняем состояния в файл (опционально); при перезапусках на локальной машине
     persistence = PicklePersistence(filepath="bot_state.pkl")
     application = ApplicationBuilder().token(token).persistence(persistence).build()
 
